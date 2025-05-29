@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox, scrolledtext, simpledialog, ttk
 import os
-
+#gmail password: gregor123
 class TodoApp:
     def __init__(self, root):
         self.root = root
