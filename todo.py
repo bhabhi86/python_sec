@@ -6,11 +6,10 @@ class TodoApp:
     def __init__(self, root):
         self.root = root
         self.root.title("My To-Do List")
-        self.root.geometry("500x600") # Adjusted size for better layout
-        self.root.resizable(False, False) # Make window not resizable
+        self.root.geometry("500x600")
+        self.root.resizable(False, False)
 
         self.todo_file = "todo_list.txt"
-        # Stores tasks as dictionaries: {'text': 'Task Name', 'completed': False}
         self.tasks = []
 
         self.load_tasks()
@@ -28,7 +27,6 @@ class TodoApp:
 
         self.task_entry = ttk.Entry(entry_frame, width=40, font=("Helvetica", 12))
         self.task_entry.pack(side=tk.LEFT, expand=True, fill="x", padx=(0, 10))
-        # Bind Enter key to add_task
         self.task_entry.bind("<Return>", self.add_task_event)
 
         self.add_button = ttk.Button(entry_frame, text="Add Task", command=self.add_task)
@@ -41,11 +39,11 @@ class TodoApp:
         self.task_listbox = tk.Listbox(
             list_frame,
             font=("Helvetica", 12),
-            selectmode=tk.SINGLE, # Only allow single selection
+            selectmode=tk.SINGLE,
             height=15,
-            bd=0, # Border width
-            highlightthickness=0, # No highlight around selection
-            activestyle='none' # No active style on hover
+            bd=0,
+            highlightthickness=0,
+            activestyle='none'
         )
         self.task_listbox.pack(side=tk.LEFT, fill="both", expand=True)
 
@@ -82,18 +80,16 @@ class TodoApp:
                         line = line.strip()
                         if line.startswith("[X] "):
                             self.tasks.append({'text': line[4:], 'completed': True})
-                        elif line: # Only add non-empty lines
+                        elif line:
                             self.tasks.append({'text': line, 'completed': False})
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to load tasks: {e}")
         else:
-            # Create the file if it doesn't exist
             try:
                 with open(self.todo_file, "w", encoding="utf-8") as f:
-                    pass # Just create an empty file
+                    pass
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to create todo file: {e}")
-
 
     def save_tasks(self):
         """Saves current tasks to the todo_list.txt file."""
@@ -113,13 +109,12 @@ class TodoApp:
         for i, task in enumerate(self.tasks):
             self.task_listbox.insert(tk.END, task['text'])
             if task['completed']:
-                # Apply overstrike and foreground directly to the item by its index
-                self.task_listbox.itemconfig(i, {"fg": "gray", "overstrike": True})
+                # ONLY change foreground color for older Tk versions
+                self.task_listbox.itemconfig(i, {"fg": "gray"})
             else:
-                self.task_listbox.itemconfig(i, {"fg": "black", "overstrike": False})
+                self.task_listbox.itemconfig(i, {"fg": "black"})
 
     def add_task_event(self, event=None):
-        """Callback for adding a task (e.g., from Enter key press)."""
         self.add_task()
 
     def add_task(self):
@@ -137,7 +132,6 @@ class TodoApp:
         """Toggles the completion status of the selected task."""
         try:
             selected_task_index = self.task_listbox.curselection()[0]
-            # Toggle the 'completed' status
             self.tasks[selected_task_index]['completed'] = not self.tasks[selected_task_index]['completed']
             self.refresh_task_display()
             self.save_tasks()
@@ -160,20 +154,17 @@ class TodoApp:
             selected_task_index = self.task_listbox.curselection()[0]
             current_text = self.tasks[selected_task_index]['text']
 
-            # Open a dialog to get the new task text
             new_text = simpledialog.askstring("Edit Task", "Edit the selected task:", initialvalue=current_text)
 
-            # Check if user clicked OK and entered non-empty text
             if new_text is not None and new_text.strip():
                 self.tasks[selected_task_index]['text'] = new_text.strip()
                 self.refresh_task_display()
                 self.save_tasks()
-            elif new_text is not None: # User clicked OK but entered empty text
+            elif new_text is not None:
                 messagebox.showwarning("Input Error", "Task cannot be empty!")
 
         except IndexError:
             messagebox.showwarning("Selection Error", "Please select a task to edit.")
-
 
     def clear_completed(self):
         """Removes all tasks marked as completed from the list."""
@@ -186,7 +177,6 @@ class TodoApp:
             "Are you sure you want to clear all completed tasks?"
         )
         if response:
-            # Create a new list containing only tasks that are NOT completed
             self.tasks = [task for task in self.tasks if not task['completed']]
             self.refresh_task_display()
             self.save_tasks()
@@ -194,8 +184,6 @@ class TodoApp:
 
 
 if __name__ == "__main__":
-    # Create the main Tkinter window
     root = tk.Tk()
-    # Instantiate and run the To-Do application
     app = TodoApp(root)
     root.mainloop()
