@@ -16,7 +16,7 @@ def load_from_config(key, file):
 app = Flask(__name__)
 
 # This is a simplified example; in a real Flask app, 'request' is usually passed to a view function
-# We'll simulate its structure for the purpose of the security check.
+# We'll simulate its structure for the purpose of the security check..
 def process_request(request_data):
     password = request_data["password"]
 
