@@ -2,38 +2,47 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ main, master ] # Scan on pushes to the main/master branch
+    branches: [ "main" ] # or "master", adjust to your default branch
   pull_request:
-    branches: [ main, master ] # Scan on pull requests targeting main/master
+    branches: [ "main" ] # or "master"
   schedule:
-    - cron: '30 1 * * 0' # Weekly scan every Sunday at 01:30 UTC
+    - cron: '0 0 * * *' # Weekly scan
 
 jobs:
   analyze:
     name: Analyze
-    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+    runs-on: ubuntu-latest
     permissions:
-      security-events: write # Required to upload SARIF results
-      actions: read          # Required to checkout the repository
+      security-events: write
+      actions: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'python' ] # Specify the language of your project
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4 # Get the code from your repo
+      uses: actions/checkout@v4
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
-        languages: python # Specify Python as the language to scan
+        languages: ${{ matrix.language }}
+        # This is where you can specify custom queries.
+        # For hardcoded credentials, the default Python queries usually cover this well.
+        # If you wanted a *very* specific custom query just for this one pattern,
+        # you'd add `queries: ./path/to/your/custom-queries`
+        # For now, let's rely on the standard suite.
+        # For a more targeted analysis on hardcoded credentials specifically,
+        # you could try specifying a query suite like this (though the default often includes it):
+        # queries: +security-and-quality
 
     - name: Autobuild
       uses: github/codeql-action/autobuild@v3
-      # For Python, autobuild often isn't strictly necessary as CodeQL analyzes source.
-      # However, it's part of the standard CodeQL Action workflow.
-      # If your project has complex build steps or dependencies, you might replace
-      # this with custom build commands.
+      # If your Python project has complex build steps (e.g., specific dependencies),
+      # you might need to replace autobuild with manual build steps.
+      # For a simple script like yours, autobuild should work.
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
-      # This step performs the actual security analysis.
-      # The results will be uploaded to GitHub Security tab automatically.
-    
