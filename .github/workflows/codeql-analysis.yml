@@ -2,47 +2,56 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ "main" ] # or "master", adjust to your default branch
+    branches: [ "main" ] # IMPORTANT: Change "main" to your default branch name if it's different (e.g., "master")
   pull_request:
-    branches: [ "main" ] # or "master"
+    branches: [ "main" ] # IMPORTANT: Change "main" to your default branch name if it's different (e.g., "master")
   schedule:
-    - cron: '0 0 * * *' # Weekly scan
+    - cron: '0 0 * * *' # Runs a full scan weekly at midnight UTC on Sundays
 
 jobs:
   analyze:
     name: Analyze
+    # Use ubuntu-latest for Linux runners, which is generally recommended for CodeQL.
     runs-on: ubuntu-latest
     permissions:
+      # Grant write permission to the security-events scope for uploading results.
       security-events: write
+      # Grant read permission to the actions scope for checking out the code.
       actions: read
 
     strategy:
-      fail-fast: false
+      fail-fast: false # Don't cancel other jobs if one fails
       matrix:
-        language: [ 'python' ] # Specify the language of your project
+        # Specify the language(s) of your project.
+        # This creates a matrix of jobs, one for each language.
+        language: [ 'python' ]
 
     steps:
     - name: Checkout repository
+      # Use actions/checkout@v4 to download your repository's code.
       uses: actions/checkout@v4
 
     - name: Initialize CodeQL
+      # Use github/codeql-action/init@v3 to set up the CodeQL environment.
       uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
-        # This is where you can specify custom queries.
-        # For hardcoded credentials, the default Python queries usually cover this well.
-        # If you wanted a *very* specific custom query just for this one pattern,
-        # you'd add `queries: ./path/to/your/custom-queries`
-        # For now, let's rely on the standard suite.
-        # For a more targeted analysis on hardcoded credentials specifically,
-        # you could try specifying a query suite like this (though the default often includes it):
-        queries: +security-and-quality
+        # Point CodeQL to the directory containing your custom queries.
+        # It will recursively find all .ql files in this path.
+        queries: ./ql/python/queries/custom/ # Path to your custom HardcodedCredentials.ql file
 
     - name: Autobuild
+      # Use github/codeql-action/autobuild@v3 to automatically build your project.
+      # For simple Python scripts, this often works out of the box.
+      # If your project has complex dependencies or a specific build process (e.g., requiring
+      # a virtual environment or pip install -r requirements.txt), you might need to
+      # replace this with custom 'run' steps to build your project.
       uses: github/codeql-action/autobuild@v3
-      # If your Python project has complex build steps (e.g., specific dependencies),
-      # you might need to replace autobuild with manual build steps.
-      # For a simple script like yours, autobuild should work.
 
     - name: Perform CodeQL Analysis
+      # Use github/codeql-action/analyze@v3 to run the CodeQL analysis and upload results.
       uses: github/codeql-action/analyze@v3
+      env:
+        # Optional: Set environment variables for the analysis if needed.
+        # For hardcoded credentials, usually not necessary.
+        # For example: CODEQL_THREADS: 0 # Use all available cores
