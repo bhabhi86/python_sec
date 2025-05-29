@@ -17,7 +17,7 @@ class TodoApp:
         self.create_widgets()
 
     def create_widgets(self):
-        # --- Header ---
+        # --- Header ----
         header_frame = ttk.Frame(self.root, padding="10")
         header_frame.pack(fill="x")
         ttk.Label(header_frame, text="To-Do List", font=("Helvetica", 18, "bold")).pack(pady=5)
