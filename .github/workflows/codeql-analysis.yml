@@ -1,0 +1,38 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ main, master ] # Scan on pushes to the main/master branch
+  pull_request:
+    branches: [ main, master ] # Scan on pull requests targeting main/master
+  schedule:
+    - cron: '30 1 * * 0' # Weekly scan every Sunday at 01:30 UTC
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+    permissions:
+      security-events: write # Required to upload SARIF results
+      actions: read          # Required to checkout the repository
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4 # Get the code from your repo
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: python # Specify Python as the language to scan
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v3
+      # For Python, autobuild often isn't strictly necessary as CodeQL analyzes source.
+      # However, it's part of the standard CodeQL Action workflow.
+      # If your project has complex build steps or dependencies, you might replace
+      # this with custom build commands.
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      # This step performs the actual security analysis.
+      # The results will be uploaded to GitHub Security tab automatically.
