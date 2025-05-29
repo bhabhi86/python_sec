@@ -51,7 +51,3 @@ jobs:
     - name: Perform CodeQL Analysis
       # Use github/codeql-action/analyze@v3 to run the CodeQL analysis and upload results.
       uses: github/codeql-action/analyze@v3
-      env:
-        # Optional: Set environment variables for the analysis if needed.
-        # For hardcoded credentials, usually not necessary.
-        # For example: CODEQL_THREADS: 0 # Use all available cores
